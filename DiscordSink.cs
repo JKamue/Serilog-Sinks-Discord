@@ -13,6 +13,7 @@ namespace Serilog.Sinks.Discord
         private readonly IFormatProvider _formatProvider;
         private readonly ulong _webhookId;
         private readonly string _webhookToken;
+        private readonly string? _username = null;
         private readonly LogEventLevel _restrictedToMinimumLevel;
         private readonly Dictionary<string, string> _properties;
         private readonly ulong? _threadId;
@@ -21,6 +22,7 @@ namespace Serilog.Sinks.Discord
             IFormatProvider formatProvider,
             UInt64 webhookId,
             string webhookToken,
+            string username = null,
             LogEventLevel restrictedToMinimumLevel = LogEventLevel.Information,
             Dictionary<string, string> properties = null,
             ulong? threadId = null)
@@ -28,6 +30,7 @@ namespace Serilog.Sinks.Discord
             _formatProvider = formatProvider;
             _webhookId = webhookId;
             _webhookToken = webhookToken;
+            _username = username;
             _restrictedToMinimumLevel = restrictedToMinimumLevel;
             _properties = properties;
             _threadId = threadId;
@@ -77,7 +80,7 @@ namespace Serilog.Sinks.Discord
 
                 webHook.SendMessageAsync(
                         null, false, new Embed[] { embedBuilder.Build() },
-                        null, null, null, null,
+                        _username, null, null, null,
                         null, MessageFlags.None, _threadId)
                     .GetAwaiter()
                     .GetResult();
@@ -86,7 +89,7 @@ namespace Serilog.Sinks.Discord
             catch (Exception ex)
             {
                 webHook.SendMessageAsync(
-                    $"ooo snap, {ex.Message}", false, null, null,
+                    $"ooo snap, {ex.Message}", false, null, _username,
                     null, null , null, null,
                     MessageFlags.None, _threadId)
                     .GetAwaiter()

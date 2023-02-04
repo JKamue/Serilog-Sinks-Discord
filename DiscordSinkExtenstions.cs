@@ -11,13 +11,14 @@ namespace Serilog.Sinks.Discord
                 this LoggerSinkConfiguration loggerConfiguration,
                 UInt64 webhookId,
                 string webhookToken,
+                string username = null,
                 IFormatProvider formatProvider = null,
                 LogEventLevel restrictedToMinimumLevel = LogEventLevel.Verbose,
                 Dictionary<string, string> properties = null,
                 ulong? threadId = null)
         {
             return loggerConfiguration.Sink(
-                new DiscordSink(formatProvider, webhookId, webhookToken, restrictedToMinimumLevel, properties, threadId));
+                new DiscordSink(formatProvider, webhookId, webhookToken, username, restrictedToMinimumLevel, properties, threadId));
         }
     }
 }
