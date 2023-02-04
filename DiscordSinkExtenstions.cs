@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Serilog.Configuration;
 using Serilog.Events;
 
-namespace Serilog.Sinks.Discord
+namespace Serilog.Sinks.Discord.JKamue
 {
     public static class DiscordSinkExtenstions
     {
