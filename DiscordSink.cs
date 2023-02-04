@@ -11,22 +11,26 @@ namespace Serilog.Sinks.Discord
     public class DiscordSink : ILogEventSink
     {
         private readonly IFormatProvider _formatProvider;
-        private readonly UInt64 _webhookId;
+        private readonly ulong _webhookId;
         private readonly string _webhookToken;
         private readonly LogEventLevel _restrictedToMinimumLevel;
         private readonly Dictionary<string, string> _properties;
+        private readonly ulong? _threadId;
+
         public DiscordSink(
             IFormatProvider formatProvider,
             UInt64 webhookId,
             string webhookToken,
             LogEventLevel restrictedToMinimumLevel = LogEventLevel.Information,
-            Dictionary<string, string> properties = null)
+            Dictionary<string, string> properties = null,
+            ulong? threadId = null)
         {
             _formatProvider = formatProvider;
             _webhookId = webhookId;
             _webhookToken = webhookToken;
             _restrictedToMinimumLevel = restrictedToMinimumLevel;
             _properties = properties;
+            _threadId = threadId;
         }
 
         public void Emit(LogEvent logEvent)
@@ -59,10 +63,6 @@ namespace Serilog.Sinks.Discord
 
                     var stackTrace = FormatMessage(logEvent.Exception.StackTrace, 1000);
                     embedBuilder.AddField("StackTrace:", stackTrace);
-
-                    webHook.SendMessageAsync(null, false, new Embed[] { embedBuilder.Build() })
-                        .GetAwaiter()
-                        .GetResult();
                 }
                 else
                 {
@@ -73,18 +73,22 @@ namespace Serilog.Sinks.Discord
                     SpecifyEmbedLevel(logEvent.Level, embedBuilder);
 
                     embedBuilder.Description = message;
-
-                    webHook.SendMessageAsync(
-                        null, false, new Embed[] { embedBuilder.Build() })
-                        .GetAwaiter()
-                        .GetResult();
                 }
+
+                webHook.SendMessageAsync(
+                        null, false, new Embed[] { embedBuilder.Build() },
+                        null, null, null, null,
+                        null, MessageFlags.None, _threadId)
+                    .GetAwaiter()
+                    .GetResult();
             }
 
             catch (Exception ex)
             {
                 webHook.SendMessageAsync(
-                    $"ooo snap, {ex.Message}", false)
+                    $"ooo snap, {ex.Message}", false, null, null,
+                    null, null , null, null,
+                    MessageFlags.None, _threadId)
                     .GetAwaiter()
                     .GetResult();
             }
